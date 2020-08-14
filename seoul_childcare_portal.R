@@ -22,7 +22,7 @@ tab <- readHTMLTable(txt_p)
 Sys.setlocale("LC_ALL", "Korean")
 df1 <- tab[[1]]
 head(df1)
-write_xlsx(df, "seoul_childcare_center_p3_XML.xlsx") 
+write_xlsx(df1, "seoul_childcare_center_p3_XML.xlsx") 
 
 
 ## Method 2. rvest library
@@ -33,7 +33,7 @@ df2 <- read_html(url) %>%
 Sys.setlocale("LC_ALL", "Korean")
 head(df2)
 
-write_xlsx(df, "seoul_childcare_center_p3_rvest.xlsx") 
+write_xlsx(df2, "seoul_childcare_center_p3_rvest.xlsx") 
 
 
 
@@ -59,16 +59,16 @@ url <- "https://iseoul.seoul.go.kr/portal/info/preSchoolList.do?pageIndex=3"
 txt <- readLines(url)
 txt_p <- htmlParse(txt)
 tab <- readHTMLTable(txt_p)
-df <- tab[[1]]
-head(df)
+df1 <- tab[[1]]
+head(df1)
 
-write_xlsx(df, "seoul_childcare_center_p3_XML.xlsx") 
+write_xlsx(df1, "seoul_childcare_center_p3_XML.xlsx") 
 
 
 ### Method 2. rvest library
-df <- read_html(url) %>% 
+df2 <- read_html(url) %>% 
   html_table() %>% 
   as.data.frame()
-head(df)
+head(df2)
 
-write_xlsx(df, "seoul_childcare_center_p3_rvest.xlsx") 
+write_xlsx(df2, "seoul_childcare_center_p3_rvest.xlsx") 
