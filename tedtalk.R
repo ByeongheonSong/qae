@@ -1,10 +1,10 @@
 #2. Ted Talks
 
 library(rvest)
-library(stringr)
-library(dplyr)
 library(XML)
-
+library(dplyr)
+library(stringr)
+library(writexl)
 
 ## Case 1. Extract speaker names from the first page.
 
@@ -77,4 +77,4 @@ colnames(Stack) <- c("speaker", "title", "posted", "link")
 head(Stack)
 
 outfile <- "tedtalk_list.xlsx"
-write.xlsx(Stack, outfile, row.names = F)
+write_xlsx(Stack, outfile)
