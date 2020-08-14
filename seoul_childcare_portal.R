@@ -8,17 +8,15 @@ library(rvest)
 library(xlsx)
 library(dplyr)
 
-
 url <- "https://iseoul.seoul.go.kr/portal/info/preSchoolList.do?pageIndex=3"
-
 
 ## Method 1. XML library
 txt <- readLines(url)
 txt_p <- htmlParse(txt)
 tab <- readHTMLTable(txt_p)
-df<-tab[[1]]
+df <- tab[[1]]
 
-write.xlsx(df,"seoul_childcare_center_p3.xlsx") 
+write.xlsx(df, "seoul_childcare_center_p3.xlsx") 
 
 
 ## Method 2. rvest library
@@ -26,4 +24,4 @@ df <- read_html(url) %>%
   html_table() %>% 
   as.data.frame()
 
-write.xlsx(df,"seoul_childcare_center_p3.xlsx")
+write.xlsx(df, "seoul_childcare_center_p3.xlsx")
