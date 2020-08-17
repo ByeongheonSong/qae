@@ -16,4 +16,6 @@
 
 - [R 참고자료](https://sites.google.com/view/jaesung/r/references)
 
+- [청년 AI Big Data 아카데미 온라인 기초과정 (MOOC) - 한국어로 진행되는 4개의 R 강좌](https://pabi.smartlearn.io/)
+
 - [Interesting Articles using Web-based Data or Machine Learning](https://sites.google.com/view/jaesung/recommendation/interesting-articles)
