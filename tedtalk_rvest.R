@@ -13,11 +13,30 @@ library(writexl)
 ## rvest method
 baseURL <- "http://www.ted.com/talks?page=1"
 res <- read_html(baseURL)
+
+## speaker
+
+## xpath
 pattern <- "//div[@class='container results']//h4[@class='h12 talk-link__speaker']"
 res %>% html_nodes(xpath=pattern) %>% 
   html_text()
 
+## css selector using selector gadget
+pattern <- ".talk-link__speaker"
+res %>% html_nodes(pattern) %>% 
+  html_text()
 
+### title
+pattern <- "#browse-results div.media__message .ga-link"
+res %>% html_nodes(pattern) %>% 
+  html_text() %>% 
+  str_trim
+
+### link
+pattern <- "#browse-results div.media__message .ga-link"
+res %>% html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("http://www.ted.com", .)
 
 
 
@@ -85,7 +104,3 @@ head(Stack)
 
 outfile <- "tedtalk_list.xlsx"
 write_xlsx(Stack, outfile)
-
-
-
-
