@@ -51,8 +51,10 @@ URL <- ""
 res <- read_html(URL)
 
 # Table
+#Sys.setlocale("LC_ALL", "C")
 res %>% 
   html_table()
+#Sys.setlocale("LC_ALL", "Korean")
 
 # Element
 pattern <- ""
@@ -60,7 +62,7 @@ res %>%
   html_nodes() %>% 
   html_text()
 
-# Attribute's value: link
+# Attribute
 pattern <- ""
 res %>% 
   html_nodes() %>% 
