@@ -1,0 +1,50 @@
+library(rvest)
+library(tidyverse)
+library(httr)
+library(jsonlite)
+
+# 자료 요청을 위한 referer와 user_agent를 설정
+daum.r <- "https://finance.daum.net"
+daum.ua <-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.122 Safari/537.36"
+
+
+## Case 1. 1페이지에 나오는 10분 가격 변화 가져오기
+
+# Developer tool의 network tab에서 요청 URL을 가지고 옴
+URL <- "https://finance.daum.net/api/market_index/times?page=1&perPage=20&market=KOSPI&pagination=true"
+
+# referer와 user_agent 정보를 함께 서버에 요청해야 정상적인 회신을 줌
+res <- GET(URL, add_headers(referer=daum.r, user_agent=daum.ua))
+doc <- toString(res)
+
+# JSON type으로 제공된 source file에서 정보를 추출
+tab <- fromJSON(doc)
+
+# tab 이라는 list에서 원하는 정보가 있는 data.frame만 추출
+df1 <- tab[[1]]
+df2 <- tab$data
+
+
+
+## Case 2. 당일 1분 간격 장시작부터 장종료까지 KOSPI 변화
+
+Stack <- NULL
+for (i in 1:4) {
+  
+  print(i)
+  
+  URL <- str_c("https://finance.daum.net/api/market_index/times?page=", i, "&perPage=100&market=KOSPI&pagination=true")
+  
+  res <- GET(URL, add_headers(referer=daum.r, user_agent=daum.ua))
+  doc <- toString(res)
+  
+  tab <- fromJSON(doc)
+  df <- tab[[1]]
+  
+  Stack <- rbind(Stack, df)
+  
+  Sys.sleep(1)
+
+}
+
+dim(Stack)
