@@ -7,6 +7,8 @@
 
 - [Web Scraping Reference: Cheat Sheet for Web Scraping using R](https://github.com/yusuzech/r-web-scraping-cheat-sheet)
 
+- [RSelenium - Basics](https://docs.ropensci.org/RSelenium/articles/basics.html)
+
 - [Install Java for Windows 64 bit](https://www.java.com/en/download/faq/java_win64bit.xml)
 
 - 환경변수에 Java 실행 파일 Path 추가
