@@ -5,6 +5,10 @@
 ### 8/21
 - [Chrome에 Selector Gadget add-in 설치하는 링크](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb?hl=en)
 
+- [Web Scraping Reference: Cheat Sheet for Web Scraping using R](https://github.com/yusuzech/r-web-scraping-cheat-sheet)
+
+<br>
+
 ### 8/14
 
 #### 오늘 수업에서는 두 가지 설문 조사를 함께 진행할 예정입니다.
