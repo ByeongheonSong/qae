@@ -9,7 +9,9 @@
 
 - [Install Java for Windows 64 bit](https://www.java.com/en/download/faq/java_win64bit.xml)
 
-- 환경변수에 Path 추가: "내 PC" -> 오른쪽 마우스 클릭 후 "속성" -> "고급 시스템 설정" -> "고급" 탭 하단 "환경 변수" -> "Path"를 클릭하고 들어가서 새로 만들기 선택 -> Java 실행 파일이 있는 경로를 추가 ("C:\Program Files\Java\jre1.8.0_231\bin" or "C:\Program Files (x86)\Java\jre1.8.0_231\bin"
+- 환경변수에 Java 실행 파일 Path 추가
+  * "**내 PC**" -> 오른쪽 마우스 클릭 후 "**속성**" -> "**고급 시스템 설정**" -> "**고급**" 탭 하단 "**환경 변수**" -> "**Path**"를 클릭하고 들어가서 새로 만들기 선택 -> Java 실행 파일이 있는 경로를 추가 
+  * "C:\Program Files\Java\jre1.8.0_231\bin" or "C:\Program Files (x86)\Java\jre1.8.0_231\bin"인 경우일 가능성이 높음
   * 주의: 윈도우 64 bit를 쓰면 반드시 Java도 64 bit를 설치해야 합니다.
 
 <br>
