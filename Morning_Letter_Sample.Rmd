@@ -1,0 +1,335 @@
+---
+title: "Morning Letter"
+output: 
+  flexdashboard::flex_dashboard:
+  orientation: columns
+vertical_layout: fill
+---
+  
+  
+```{r setup, include=FALSE}
+
+rm(list=ls())
+
+library(flexdashboard)
+library(XML)
+library(rvest)
+library(stringr)
+library(lubridate)
+library(dplyr)
+library(tidyr)
+library(httr)
+library(readxl)
+library(writexl)
+library(jsonlite)
+library(knitr)
+library(DT)
+library(kableExtra)
+
+
+## 날짜 및 시간 설정
+time.issued <- Sys.time()
+time.seoul <- with_tz(time.issued, tzone="Asia/Seoul")
+today.seoul <- Sys.time() %>% with_tz(tzone="Asia/Seoul")
+
+today.m0 <- today.seoul %m-% days(0) %>% format("%Y.%m.%d.")
+today.m1 <- today.seoul %m-% days(1) %>% format("%Y.%m.%d.")
+today.m2 <- today.seoul %m-% days(2) %>% format("%Y.%m.%d.")
+today.m3 <- today.seoul %m-% days(3) %>% format("%Y.%m.%d.")
+today.m4 <- today.seoul %m-% days(4) %>% format("%Y.%m.%d.")
+today.m5 <- today.seoul %m-% days(5) %>% format("%Y.%m.%d.")
+today.m6 <- today.seoul %m-% days(6) %>% format("%Y.%m.%d.")
+today.m7 <- today.seoul %m-% days(7) %>% format("%Y.%m.%d.")
+
+
+## 팟빵 에피소드 수집 함수 선언
+podbbang <- function(channel.id) {
+  
+  url<-paste0("http://www.podbbang.com/podbbangchnew/episode_list?id=",channel.id,"&page=1")
+  res<-read_html(url)
+  
+  res %>% html_nodes("div.epi_repeat ul dt") %>% html_text() -> title
+  res %>% html_nodes("div.epi_repeat ul li") %>% html_attr("epiuid") -> epid
+  res %>% html_nodes("dd.dd_date") %>% html_text() %>% str_trim() -> date
+  
+  time.system <- Sys.time()
+  time.seoul <- with_tz(time.system, tzone="Asia/Seoul") %>% format("%y.%m.%d")
+  date[date=="Today"] <- time.seoul
+  title<-str_replace_all(title,"^[0-9]{2}/[0-9]{2} -","") %>% str_trim()
+  
+  tab<-cbind(date,title,epid) %>% 
+    as.data.frame(stringsAsFactors=FALSE)
+  
+  return(tab)
+  
+}
+
+
+## Naver News Keyword Search: Declare function for keyword search in Naver News
+news.search <- function(keyword) {
+  
+  Stack<-NULL
+
+  url_keyword <- URLencode(keyword)
+  url <- str_c("https://search.naver.com/search.naver?&where=news&query=",url_keyword,"&sm=tab_pge&sort=1&photo=0&field=0&reporter_article=&pd=0&ds=&de=&docid=&nso=so:dd,p:all,a:all&mynews=0&start=",i,"&refresh_start=0")
+  
+  res<-read_html(url)
+  
+  title <- res %>% 
+    html_nodes("ul.type01 li dt a") %>% 
+    html_text()
+  
+  res %>% 
+    html_nodes("ul.type01 li dd.txt_inline") %>% 
+    html_text() %>% 
+    str_remove_all("보내기|네이버뉴스|선정") %>% 
+    str_trim() %>% str_split_fixed(" ", 2) %>% 
+    as.data.frame() %>% mutate_all(~ str_trim(.)) -> e1
+  
+  source <- e1$V1 %>% 
+    str_remove_all("언론사")
+  date <- e1$V2
+  
+  link <- res %>% 
+    html_nodes("ul.type01 li dt a") %>% 
+    html_attr("href")
+  
+  tab <- cbind(date, title, source, link) %>% 
+    as.data.frame(stringsAsFactors=FALSE)
+  
+  Stack<-rbind(Stack,tab)
+    
+  
+  Stack.out <- Stack %>%
+    mutate(date = str_remove(date, "Korea언론사|Korea|foodnews")) %>% 
+    mutate(date = str_trim(str_remove(date, "^.*면.단"))) %>% 
+    mutate(date = str_trim(str_remove(date, "^.*면"))) %>% 
+    mutate(date = case_when(str_detect(date, ".*시간 전") ~ today.m0,
+                          date=="1일 전" ~ today.m1,
+                          date=="2일 전" ~ today.m2,
+                          date=="3일 전" ~ today.m3,
+                          date=="4일 전" ~ today.m4,
+                          date=="5일 전" ~ today.m5,
+                          date=="6일 전" ~ today.m6,
+                          date=="7일 전" ~ today.m7,
+                          TRUE ~ date
+                          )
+    )
+  
+  return(Stack.out)
+  
+}
+
+
+# 섹션별 랭킹 뉴스 30개 수집
+ranking.news.collect <- function(section, section.code, search.date) {
+  
+  URL <- str_c("https://news.naver.com/main/ranking/popularDay.nhn?rankingType=popular_day&sectionId=", section.code, "&date=", search.date)
+  res <- read_html(URL)
+  
+  e1 <- res %>% 
+    html_nodes("div.ranking_headline > a") %>% 
+    html_text()
+  
+  e2 <- res %>% 
+    html_nodes(".ranking_lede") %>% 
+    html_text() %>% str_trim()
+  
+  e3 <- res %>% 
+    html_nodes(".ranking_office") %>% 
+    html_text()
+  
+  e4 <- res %>% 
+    html_nodes("div.ranking_headline > a") %>% 
+    html_attr("href") %>% 
+    str_c("https://news.naver.com", .)
+  
+  ranking <- c(1:30)
+  
+  tab <- cbind(section, ranking, e1, e2, e3, e4) %>% 
+    as_tibble()
+  
+  return(tab)
+  
+}
+
+```
+
+
+
+
+
+1. Article
+=======================================================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+### Chart A1 (**Issued at `r time.seoul`**)
+
+**랭킹 뉴스** - 경제 분야, 사회 분야
+
+```{r}
+
+sections <- c("경제", "사회")
+section.codes <- c(101, 102)
+
+search.date <- Sys.time() %m-% days(1) %>% format("%Y%m%d")
+
+Stack <- NULL
+for (i in 1:2) {
+  
+  section <- sections[i]
+  section.code <- section.codes[i]
+  
+  tab <- ranking.news.collect(section, section.code, search.date)
+  Stack <- rbind(Stack, tab)
+  
+  # Sys.sleep(1)
+  
+}
+
+names(Stack) <- c("Section", "Ranking", "Title", "Description", "Source", "Link")
+
+df <- Stack %>% 
+  select("Section", "Ranking", "Title", "Source", "Link")
+
+## Change variables to export as an html file. 
+df.out <- df %>% 
+  mutate(Title = cell_spec(Title, "html", link = Link, color="#062872")) %>% 
+  mutate(Title = str_replace(Title, '(<a href=.*\\") ', '\\1 target=\\"_blank\\"')) %>% 
+  select(-Link) 
+
+df.out %>%
+  kable(escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+```
+
+
+
+
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+### Chart B1
+
+**네이버 뉴스 검색**
+
+```{r}
+list <- c("성균관대 경제학과", "마부작침", "한국사회과학자료원")
+Stack <- NULL
+for (keyword in list) {
+  
+  search <- keyword
+  tab <- news.search(keyword)
+  tab <- cbind(search, tab) %>% 
+    arrange(desc(date))
+  Stack <- rbind(Stack, tab)
+  
+}
+
+names(Stack) <- c("Search", "Date", "Title", "Source", "Link")
+
+df <- Stack %>%
+  mutate(Title = cell_spec(Title, "html", link = Link, color="#062872")) %>% 
+  select(Date, Search, Title, Source)
+
+df %>% 
+  kable(escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  column_spec(1, width = "8em") %>%
+  column_spec(2, width = "10em") %>%
+  column_spec(3, width = "30em") %>%
+  column_spec(4, width = "10em")
+
+```
+
+
+
+
+
+2. Podcast
+=======================================================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+### Chart A1 (**Issued at `r time.seoul`**)
+
+[이진우의 손에 잡히는 경제](http://www.podbbang.com/ch/75), [Youtube MBC라디오](https://www.youtube.com/channel/UCTTmtS2ljy1vyl_s-d_LEHQ/playlists)
+
+```{r}
+channel.name <- "이진우의 손에 잡히는 경제"
+channel.id <- 75
+
+df<-podbbang(channel.id)
+df %>% head(10) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  column_spec(1, width = "6em") %>%
+  column_spec(2, width = "35em") %>%
+  column_spec(3, width = "6em")
+```
+
+
+
+
+### Chart A2
+
+[데이터홀릭](http://www.podbbang.com/ch/1771386)
+
+```{r}
+channel.name <- "데이터홀릭"
+channel.id <- 1771386
+
+df<-podbbang(channel.id)
+df %>% head(10) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  column_spec(1, width = "6em") %>%
+  column_spec(2, width = "35em") %>%
+  column_spec(3, width = "6em")
+```
+
+
+
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Chart B1
+
+[김종배의 시선집중](http://www.podbbang.com/ch/61), [Youtube MBC라디오](https://www.youtube.com/channel/UCTTmtS2ljy1vyl_s-d_LEHQ/playlists)
+
+```{r}
+channel.name <- "김종배의 시선집중"
+channel.id <- 61
+
+df<-podbbang(channel.id)
+df %>% head(10) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  column_spec(1, width = "6em") %>%
+  column_spec(2, width = "35em") %>%
+  column_spec(3, width = "6em")
+```
+
+
+
+### Chart B2
+
+[CBS 김현정의 뉴스쇼](http://www.podbbang.com/ch/225)
+
+```{r}
+channel.name <- "김현정의 뉴스쇼"
+channel.id <- 225
+
+df<-podbbang(channel.id)
+df %>% head(10) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  column_spec(1, width = "6em") %>%
+  column_spec(2, width = "35em") %>%
+  column_spec(3, width = "6em")
+```
+
+
