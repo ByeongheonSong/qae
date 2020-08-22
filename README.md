@@ -3,6 +3,9 @@
 <br>
 
 ### 8/21
+
+- [박찬엽 알코홀릭](https://www.youtube.com/c/Rcoholic/playlists)
+
 - [Chrome에 Selector Gadget add-in 설치하는 링크](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb?hl=en)
 
 - [Web Scraping Reference: Cheat Sheet for Web Scraping using R](https://github.com/yusuzech/r-web-scraping-cheat-sheet)
